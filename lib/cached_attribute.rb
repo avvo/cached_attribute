@@ -33,7 +33,7 @@ module CachedAttribute
     #
     def cached_attribute(attr, opts = {})
 
-      cache = opts[:cache] || (defined?(Cache) && Cache)
+      cache = opts[:cache] || (defined?(CACHE) && CACHE)
       ttl = opts[:ttl] || 300
 
       define_method("#{attr}_with_caching") do
