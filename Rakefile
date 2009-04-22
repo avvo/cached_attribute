@@ -20,3 +20,4 @@ Rake::RDocTask.new(:rdoc) do |rdoc|
   rdoc.rdoc_files.include('README.markdown')
   rdoc.rdoc_files.include('lib/**/*.rb')
 end
+

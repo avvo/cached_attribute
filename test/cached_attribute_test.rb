@@ -8,11 +8,16 @@ class DummyCache
     @data = {}
     @cache_hit = false
     @last_get = nil
+    @last_set = nil
   end
   reset
 
   def self.cache_hit?
     @cache_hit
+  end
+  
+  def self.last_set
+    @last_set
   end
 
   def self.last_get
@@ -41,6 +46,7 @@ class DummyCache
   end
 
   def self.set(key, value, ttl = 60)
+    @last_set = Time.now
     @data[key] = [value, Time.now + ttl]
   end
 
@@ -108,6 +114,20 @@ class CachedAttributeTest < Test::Unit::TestCase
     sleep 1
     @m.low_ttl
     assert !DummyCache.cache_hit?, "Cache should not be hit after 1 second"    
+  end
+  
+  def test_refresh
+    @m.no_memoization
+    assert !DummyCache.cache_hit?, "Cache should not be hit on initial call"
+    last_set = DummyCache.last_set
+    @m.no_memoization
+    assert DummyCache.cache_hit?, "Cache should be a hit"
+    sleep 1
+    @m.refresh_no_memoization
+    next_set = DummyCache.last_set
+    @m.no_memoization
+    assert DummyCache.cache_hit?, "Cache should still be a hit"
+    assert(last_set < next_set)
   end
 
 end

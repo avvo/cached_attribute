@@ -10,7 +10,7 @@ module CachedAttribute
     #
     #   :ttl         - The ttl (in seconds) for the cached attribute. Defaults to 5 minutes.
     #   :cache       - The cache store object to use for caching. Must respond to #get (with block)
-    #                  and #delete.
+    #                  and #delete and #set or #put (key, value, expiry).
     #   :identifier  - A block that takes a single parameter (of the object containing the cached
     #                  attribute) and returns an identifier unique to that object. Defaults to 
     #                  lambda {|s| s.id}, which works fine for activerecord objects.
@@ -69,6 +69,16 @@ module CachedAttribute
           identifier =  opts[:identifier] ? opts[:identifier].call(self) : self.id
           cache_key = "#{self.class.name}::#{attr}::" + identifier.to_s
           cache.delete(cache_key)
+        end
+      end
+      
+      # refreshs the cached attribute
+      define_method("refresh_#{attr}") do
+        if cache
+          identifier = opts[:identifier] ? opts[:identifier].call(self) : self.id
+          set_method = cache.respond_to?(:set) ? :set : :put
+          val = send("#{attr}_without_caching")
+          cache.send(set_method, "#{self.class.name}::#{attr}::#{identifier.to_s}", val, ttl)
         end
       end
       
