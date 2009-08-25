@@ -7,7 +7,8 @@ per-instance basis. It supports memoization, multiple cache stores, invalidation
 It can also be used to cached arbitrary methods based on their
 
 Example
-=======    
+=======
+
     class ComplicatedModel < ActiveRecord::Base
       
       def expensive_operation
