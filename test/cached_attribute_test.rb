@@ -159,4 +159,12 @@ class CachedAttributeTest < Test::Unit::TestCase
     assert DummyCache.cache_hit?, 'Second call should be hit'
   end
 
+  def test_class_method_key
+    assert_equal("BaseModel::self::expensive_class_method::#{Digest::SHA1.hexdigest(1.to_s)}", BaseModel.expensive_class_method_cache_key(1))
+  end
+
+  def test_instance_method_key
+    assert_equal("BaseModel::expensive_instance_method::#{Digest::SHA1.hexdigest(1.to_s)}", @m.expensive_instance_method_cache_key(1))
+  end
+
 end

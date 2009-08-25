@@ -44,7 +44,9 @@ module CachedAttribute
         else
           identifier = opts[:identifier] ? opts[:identifier].call(self) : self.id
         end
-        "#{self.class.name}::#{attr}::#{Digest::SHA1.hexdigest(identifier)}"
+        # need to special case when we're caching class methods
+        klass_string = "#{self.class == Class ? self.name + '::self' : self.class.name}"
+        "#{klass_string}::#{attr}::#{Digest::SHA1.hexdigest(identifier)}"
       end
 
       define_method("#{attr}_with_caching") do |*prms|
