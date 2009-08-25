@@ -1,6 +1,8 @@
 require 'test/unit'
 require File.join(File.dirname(__FILE__), '../lib/cached_attribute')
-
+require 'init'
+require 'rubygems'
+require 'activesupport'
 
 class DummyCache
 
@@ -53,7 +55,18 @@ class DummyCache
 end
 
 class BaseModel
-  include CachedAttribute
+
+  class << self
+    def expensive_class_method(number)
+      number + 50
+    end
+    cached_attribute :expensive_class_method, :cache => DummyCache
+  end
+
+  def expensive_instance_method(p1, p2)
+    p1 + p2
+  end
+  cached_attribute :expensive_instance_method, :cache => DummyCache
 
   def expensive_call
     "hello" * 50
@@ -128,6 +141,22 @@ class CachedAttributeTest < Test::Unit::TestCase
     @m.no_memoization
     assert DummyCache.cache_hit?, "Cache should still be a hit"
     assert(last_set < next_set)
+  end
+
+  def test_on_class_method_with_params
+    assert_equal(51, BaseModel.expensive_class_method(1))
+    assert !DummyCache.cache_hit?, 'First call should be miss'
+
+    assert_equal(51, BaseModel.expensive_class_method(1))
+    assert DummyCache.cache_hit?, 'Second call should be hit'
+  end
+
+  def test_on_instance_method_with_params
+    assert_equal(11, @m.expensive_instance_method(5, 6))
+    assert !DummyCache.cache_hit?, 'First call should be miss'
+
+    assert_equal(11, @m.expensive_instance_method(5, 6))
+    assert DummyCache.cache_hit?, 'Second call should be hit'
   end
 
 end

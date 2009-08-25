@@ -1,3 +1,3 @@
-ActiveRecord::Base.instance_eval do
+Object.instance_eval do
   include CachedAttribute
 end
