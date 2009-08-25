@@ -1,4 +1,5 @@
 require 'digest/sha1'
+require 'pp'
 
 module CachedAttribute
   module ClassMethods
@@ -40,7 +41,7 @@ module CachedAttribute
 
       define_method("#{attr}_cache_key") do |*prms|
         if prms.present?
-          identifier = prms.to_s
+          identifier = prms.pretty_inspect # pretty inspect works nicely because it properly escpaes all the params into one string
         else
           identifier = opts[:identifier] ? opts[:identifier].call(self) : self.id
         end
