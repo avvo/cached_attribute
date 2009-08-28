@@ -105,7 +105,7 @@ class CachedAttributeTest < Test::Unit::TestCase
     assert DummyCache.cache_hit?, "Cache should be hit on the second call"
     assert_equal(v, DummyCache.last_get)
   end
-  
+
   def test_cached_attribute_memoizes_attribute
     v1 = @m.expensive_call
     assert_equal(v1, @m.instance_variable_get("@expensive_call"))
@@ -118,7 +118,7 @@ class CachedAttributeTest < Test::Unit::TestCase
     assert !DummyCache.cache_hit?, "Cache should not be hit on initial call"
     @m.invalidate_no_memoization
     @m.no_memoization
-    assert !DummyCache.cache_hit?, "Cache should not be hit after invalidation"    
+    assert !DummyCache.cache_hit?, "Cache should not be hit after invalidation"
   end
 
   def test_ttl_should_work
@@ -126,9 +126,9 @@ class CachedAttributeTest < Test::Unit::TestCase
     assert !DummyCache.cache_hit?, "Cache should not be hit on initial call"
     sleep 1
     @m.low_ttl
-    assert !DummyCache.cache_hit?, "Cache should not be hit after 1 second"    
+    assert !DummyCache.cache_hit?, "Cache should not be hit after 1 second"
   end
-  
+
   def test_refresh
     @m.no_memoization
     assert !DummyCache.cache_hit?, "Cache should not be hit on initial call"
@@ -160,11 +160,11 @@ class CachedAttributeTest < Test::Unit::TestCase
   end
 
   def test_class_method_key
-    assert_equal("BaseModel::self::expensive_class_method::#{Digest::SHA1.hexdigest(1.to_s)}", BaseModel.expensive_class_method_cache_key(1))
+    assert_equal("BaseModel::self::expensive_class_method::#{Digest::SHA1.hexdigest([1].pretty_inspect)}", BaseModel.expensive_class_method_cache_key(1))
   end
 
   def test_instance_method_key
-    assert_equal("BaseModel::expensive_instance_method::#{Digest::SHA1.hexdigest(1.to_s)}", @m.expensive_instance_method_cache_key(1))
+    assert_equal("BaseModel::expensive_instance_method::#{Digest::SHA1.hexdigest([1].pretty_inspect)}", @m.expensive_instance_method_cache_key(1))
   end
 
 end

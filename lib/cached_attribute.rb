@@ -43,7 +43,7 @@ module CachedAttribute
         if prms.present?
           identifier = prms.pretty_inspect # pretty inspect works nicely because it properly escpaes all the params into one string
         else
-          identifier = opts[:identifier] ? opts[:identifier].call(self) : self.id
+          identifier = opts[:identifier] ? opts[:identifier].call(self).to_s : self.id.to_s
         end
         # need to special case when we're caching class methods
         klass_string = "#{self.class == Class ? self.name + '::self' : self.class.name}"
@@ -52,7 +52,7 @@ module CachedAttribute
 
       define_method("#{attr}_with_caching") do |*prms|
         if cache && (instance_variable_get("@#{attr}").nil? || prms.present?)
-          cache.get(send("#{attr}_cache_key", prms), ttl) do
+          cache.get(send("#{attr}_cache_key", *prms), ttl) do
             send("#{attr}_without_caching", *prms)
           end
         else
@@ -79,7 +79,7 @@ module CachedAttribute
 
       define_method("invalidate_#{attr}") do |*prms|
         if cache
-          cache_key = send("#{attr}_cache_key", prms)
+          cache_key = send("#{attr}_cache_key", *prms)
           cache.delete(cache_key)
         end
       end
@@ -89,7 +89,7 @@ module CachedAttribute
         if cache
           set_method = cache.respond_to?(:set) ? :set : :put
           val = send("#{attr}_without_caching")
-          cache.send(set_method, send("#{attr}_cache_key", prms), val, ttl)
+          cache.send(set_method, send("#{attr}_cache_key", *prms), val, ttl)
         end
       end
 
