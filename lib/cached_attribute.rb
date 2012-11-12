@@ -100,3 +100,7 @@ module CachedAttribute
     klass.extend ClassMethods
   end
 end
+
+Object.instance_eval do
+  include CachedAttribute
+end
