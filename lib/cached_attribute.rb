@@ -52,7 +52,7 @@ module CachedAttribute
 
       define_method("#{attr}_with_caching") do |*prms|
         if cache && (instance_variable_get("@#{attr}").nil? || prms.present?)
-          cache.get(send("#{attr}_cache_key", *prms), ttl) do
+          cache.fetch(send("#{attr}_cache_key", *prms), ttl) do
             send("#{attr}_without_caching", *prms)
           end
         else
